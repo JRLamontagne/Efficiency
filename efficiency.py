@@ -14,13 +14,13 @@ def MSE(S,O):
     return MSE_hat
 
 def NSE(S,O):
-    NSE_hat = 1.-MSE(S,O)/np.std(O,ddof=1)
+    NSE_hat = 1.-MSE(S,O)/np.var(O,ddof=1)
     return NSE_hat
 
 def LNSE(S,O):
     V = np.log(S)
     U = np.log(O)
-    LNSE_hat = NSE(U,V)
+    LNSE_hat = NSE(V,U)
     return LNSE_hat
 
 def KGE_prime(S,O):
@@ -31,10 +31,10 @@ def KGE_prime(S,O):
     return KGE_hat
 
 def PVSE_prime(S,O):
-    S = np.sort(S)
-    O = np.sort(O)
+    S_sort = np.sort(S/np.sum(S))
+    O_sort = np.sort(O/np.sum(O))
     beta = np.mean(S)/np.mean(O)
-    alpha = 1 - 0.5*np.mean(np.abs(S/np.mean(S)-O/np.mean(O)))
+    alpha = 1. - 0.5*np.sum(np.abs(S_sort-O_sort))
     rho,p = spearmanr(S,O)
     PVSE_hat = 1.-np.sqrt((beta-1.)**2.+(alpha-1.)**2.+(rho-1.)**2.)
     return PVSE_hat
@@ -70,19 +70,27 @@ def LBEm(S,O,period,prime=False):
 def BLN3_moments(O,S):
     U,tau_O = LN3_trans(O)
     V,tau_S = LN3_trans(S)
-    
+    if (tau_O<0) or (tau_S<0):
+        tau_O=0
+        tau_S=0
+        U = np.log(O)
+        V = np.log(S)
+        
     U_bar = np.mean(U)
     V_bar = np.mean(V)
     var_U = np.var(U,ddof=1)
     var_V = np.var(V,ddof=1)
-    cov_UV = np.cov(U,V,rowvar=False,ddof=None)[0,1]
+    var_U_0 = np.var(U,ddof=0)
+    var_V_0 = np.var(V,ddof=0)
+    #cov_UV = np.cov(U,V,rowvar=False,ddof=None)[0,1]
+    cov_UV = np.mean((U-U_bar)*(V-V_bar))
     
     mu_O = tau_O+np.exp(U_bar+var_U/2.)
     mu_S = tau_S+np.exp(V_bar+var_V/2.)
     var_O = np.exp(2.*U_bar+var_U)*(np.exp(var_U)-1.)
     var_S = np.exp(2.*V_bar+var_V)*(np.exp(var_V)-1.)
     
-    rho = (np.exp(cov_UV)-1.)/np.sqrt((np.exp(var_U)-1.)*(np.exp(var_V)-1.))
+    rho = (np.exp(cov_UV)-1.)/np.sqrt((np.exp(var_U_0)-1.)*(np.exp(var_V_0)-1.))
     return mu_O,var_O,mu_S,var_S,rho
 
 def stedinger_tau(X):

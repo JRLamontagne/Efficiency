@@ -11,10 +11,11 @@
 
 rm(list = ls())  # Remove everything in global enviroclcnment
 graphics.off()   # Close all open plots
-source(file='c:/Users/jlamon02/Dropbox/functions3BT.R', local=FALSE, echo=FALSE, print.eval=FALSE)
-S <- read.csv(file='c:/Users/jlamon02/Dropbox/S.csv',header=FALSE,sep=",")
-O <- read.csv(file='c:/Users/jlamon02/Dropbox/O.csv',header=FALSE,sep=",")
-period <- read.csv(file='c:/Users/jlamon02/Dropbox/period.csv',header=FALSE,sep=",")
+setwd("C:\\Users\\jlamon02\\Dropbox\\Caitline_Code\\ForJon\\")
+source(file="C:\\Users\\jlamon02\\Dropbox\\Caitline_Code\\ForJon\\functions3BT.R", local=FALSE, echo=FALSE, print.eval=FALSE)
+S <- read.csv(file='c:/Users/jlamon02/Dropbox/Caitline_Code/ForJon/S1.csv',header=TRUE,sep=",")
+O <- read.csv(file='c:/Users/jlamon02/Dropbox/Caitline_Code/ForJon/O1.csv',header=TRUE,sep=",")
+period <- read.csv(file='c:/Users/jlamon02/Dropbox/Caitline_Code/ForJon/period1.csv',header=TRUE,sep=",")
 
 mu_O_month <- matrix(nrow=1, ncol=12)
 Co_month <- matrix(nrow=1, ncol=12)
@@ -79,7 +80,7 @@ allData <- cbind(O,S,period)
 colnames(allData, do.NULL = FALSE)
 colnames(allData) <- c("O","S","month")
 for (m in 1:12){ # For calculations based on monthly data
-  oneSite_month <- subset(allData, allData$month== m-1) # Pull data for individual site's month
+  oneSite_month <- subset(allData, allData$month== m) # Pull data for individual site's month
   LN3params_month <- parms(oneSite_month[,1:2])
   mu_O_month[m] <- LN3params_month[1] # real space mean
   rho_month[m] <- LN3params_month[2]
